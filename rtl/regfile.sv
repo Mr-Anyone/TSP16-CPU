@@ -1,12 +1,13 @@
-module register(
-    input clk,
-    input write, 
+module Register(
+    input wire clk,
+    input wire write,
+    input wire [15:0] in,
 
-    output data
+    output reg [15:0] out
 );
+    wire [15:0] next_clk = (write) ? in : out;
 
     always @(posedge clk) begin 
-        data <= write;
+        out <= next_clk;
     end
-    
 endmodule

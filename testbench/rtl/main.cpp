@@ -1,7 +1,7 @@
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 #include <iostream>
-#include "Vtop.h"
+#include "VTop.h"
 
 VerilatedContext* init(){
     Verilated::traceEverOn(true); // trace is on now
@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
     VerilatedContext* context = init();
 
     // Creating the design under test 
-    Vtop *dut = new Vtop(context);
+    VTop *dut = new VTop(context);
 
     // Create the waveform for the top level module
     VerilatedVcdC *m_trace = new VerilatedVcdC;
@@ -24,11 +24,7 @@ int main(int argc, char **argv) {
     m_trace->open("waveform.vcd");
 
     // Setting initial data 
-    dut->A = 0;
-    dut->B = 1;
     while(context->time() < 10){
-        dut->B = !dut->B;
-
         dut->eval();
         m_trace->dump(context->time());
         context->timeInc(1);

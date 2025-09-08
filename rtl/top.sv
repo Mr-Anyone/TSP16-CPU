@@ -1,9 +1,6 @@
-module top(
-    input wire A, 
-    input wire B, 
-    output wire C
+module Top(
+    input clk
 );
-    assign C = A + B;
     
 
 endmodule
