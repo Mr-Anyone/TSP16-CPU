@@ -12,15 +12,20 @@ obj_dir/VArithmeticLogicUnit: rtl/ArithmeticLogicUnit.sv testbench/unit/alu.cpp
 	$(verilator) -cc rtl/ArithmeticLogicUnit.sv  testbench/unit/alu.cpp  --trace  --exe
 	make -C obj_dir -j -f VArithmeticLogicUnit.mk
 
+obj_dir/VMemory: rtl/Memory.sv testbench/unit/memory.cpp 
+	$(verilator) -cc rtl/Memory testbench/unit/memory.cpp --trace --exe
+	make -C obj_dir -j -f VMemory.mk
+
 obj_dir/VRegfile: rtl/Regfile.sv testbench/unit/regfile.cpp
 	$(verilator) -cc rtl/Regfile.sv  testbench/unit/regfile.cpp  --trace  --exe -Irtl
 	make -C obj_dir -j -f VRegfile.mk
 
 .PHONY: test 
-test: obj_dir/VTop obj_dir/VArithmeticLogicUnit obj_dir/VRegfile
+test: obj_dir/VTop obj_dir/VArithmeticLogicUnit obj_dir/VRegfile obj_dir/VMemory
 	./obj_dir/VTop
 	./obj_dir/VArithmeticLogicUnit
 	./obj_dir/VRegfile
+	./obj_dir/VMemory
 
 .PHONY: debug
 debug:
