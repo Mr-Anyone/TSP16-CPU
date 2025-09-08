@@ -11,3 +11,4 @@ module Register(
         out <= next_clk;
     end
 endmodule
+

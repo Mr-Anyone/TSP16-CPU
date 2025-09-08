@@ -1,7 +1,7 @@
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 #include <iostream>
-#include "Valu.h"
+#include "VArithmeticLogicUnit.h"
 
 VerilatedContext* init(){
     Verilated::traceEverOn(true); // trace is on now
@@ -12,16 +12,15 @@ VerilatedContext* init(){
     return  context;
 }
 
-void check_rd(Valu* dut, uint64_t expected, VerilatedContext* context){
-    if(dut->rd != expected){
-        std::cout << "not equal at time "  << context->time() << std::endl;
+void check_rd(VArithmeticLogicUnit* dut, uint64_t expected, VerilatedContext* context){
+    if(dut->rd != expected){ std::cout << "not equal at time "  << context->time() << std::endl;
         std::cout << "failed" << std::endl;
     }
 }
 
 int main(int argc, char **argv) {
     VerilatedContext* context = init();
-    Valu *dut = new Valu(context);
+    VArithmeticLogicUnit *dut = new VArithmeticLogicUnit(context);
 
     // Create the waveform for the top level module
     VerilatedVcdC *m_trace = new VerilatedVcdC;

@@ -2,25 +2,25 @@ verilator := verilator
 rtl_src := $(wildcard rtl/*.sv)
 top_level_testbench  := testbench/rtl/main.cpp
 
-all: lint
+all: test
 
 obj_dir/VTop: $(rtl_src) testbench/rtl/main.cpp
 	$(verilator) -cc $(rtl_src)  testbench/rtl/main.cpp  --top-module Top --trace  --exe
 	make -C obj_dir -j -f VTop.mk
 
-obj_dir/Valu: rtl/alu.sv testbench/unit/alu.cpp
-	$(verilator) -cc rtl/alu.sv  testbench/unit/alu.cpp  --trace  --exe
-	make -C obj_dir -j -f Valu.mk
+obj_dir/VArithmeticLogicUnit: rtl/ArithmeticLogicUnit.sv testbench/unit/alu.cpp
+	$(verilator) -cc rtl/ArithmeticLogicUnit.sv  testbench/unit/alu.cpp  --trace  --exe
+	make -C obj_dir -j -f VArithmeticLogicUnit.mk
 
-obj_dir/Vregfile: rtl/regfile.sv testbench/unit/regfile.cpp
-	$(verilator) -cc rtl/regfile.sv  testbench/unit/regfile.cpp  --trace  --exe
-	make -C obj_dir -j -f Vregfile.mk
+obj_dir/VRegfile: rtl/Regfile.sv testbench/unit/regfile.cpp
+	$(verilator) -cc rtl/Regfile.sv  testbench/unit/regfile.cpp  --trace  --exe -Irtl
+	make -C obj_dir -j -f VRegfile.mk
 
 .PHONY: test 
-test: obj_dir/VTop obj_dir/Valu obj_dir/Vregfile
+test: obj_dir/VTop obj_dir/VArithmeticLogicUnit obj_dir/VRegfile
 	./obj_dir/VTop
-	./obj_dir/Valu
-	./obj_dir/Vregfile
+	./obj_dir/VArithmeticLogicUnit
+	./obj_dir/VRegfile
 
 .PHONY: debug
 debug:
@@ -28,7 +28,7 @@ debug:
 
 .PHONY: lint 
 lint: 
-	$(verilator) --lint-only $(rtl_src) --top-module Top
+	$(verilator) --lint-only -Wall $(rtl_src) --top-module Top
 
 .PHONY: clean
 clean:
