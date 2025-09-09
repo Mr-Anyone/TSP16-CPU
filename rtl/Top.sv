@@ -18,11 +18,14 @@ module Top(
 
     wire [2:0] execute_rm_num, execute_rn_num;
     wire [15:0] execute_rm, execute_rn;
+    wire writeback_write_to_regfile; // be populated from Pipeline Writeback
+    wire [15:0] writeback_data;
+    wire [2:0] writeback_writenum;
     Regfile regfile(
         // write related
-        .write(1'b0), // FIXME: this is wrong 
-        .write_reg_num(3'b0), // FIXME: 
-        .write_data(16'b0), // FIXME:
+        .write(writeback_write_to_regfile),
+        .write_reg_num(writeback_writenum), // FIXME: 
+        .write_data(writeback_data), // FIXME:
         .clk(clk), 
 
         // read
@@ -47,9 +50,42 @@ module Top(
         .execute_is_dependent(execute_is_dependent),
         .execute_result(execute_result),
         .execute_instr(execute_instr),
+
         // regfile number
         .rn_num(execute_rn_num),
         .rm_num(execute_rm_num)
+    );
+
+    wire memory_done, memory_is_dependent;
+    wire [15:0] memory_result, memory_instr;
+    PipelineMemory memory_pipeline(
+        .clk(clk),
+
+        // from previous pipeline
+        .execute_done(execute_done),
+        .execute_is_dependent(execute_is_dependent),
+        .execute_result(execute_result),
+        .execute_instr(execute_instr),
+
+        // output
+        .memory_done(memory_done),
+        .memory_is_dependent(memory_is_dependent),
+        .memory_result(memory_result),
+        .memory_instr(memory_instr)
+    );
+
+    PipelineWriteback writeback_pipeline(
+        // .clk(clk),
+        // from memory pipeline
+        .memory_done(memory_done),
+        .memory_is_dependent(memory_is_dependent),
+        .memory_result(memory_result),
+        .memory_instr(memory_instr),
+
+        // output
+        .write(writeback_write_to_regfile),
+        .write_reg_num(writeback_writenum),
+        .to_regfile(writeback_data)
     );
 
     wire [15:0] read_output; // FIXME: move to somewhere else
@@ -64,6 +100,4 @@ module Top(
         .fetch_instr(fetch_instr),
         .read_output(read_output)
     );
-
-
 endmodule

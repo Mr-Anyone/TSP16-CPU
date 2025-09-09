@@ -20,8 +20,6 @@ module PipelineExecute(
     output wire [2:0] rm_num
 );
     wire [15:0] rd;
-    assign rm_num = instr[8:6];
-    assign rn_num = instr[5:3];
     ArithmeticLogicUnit alu(
         .rn(rn),
         .rm(rm),
@@ -50,9 +48,14 @@ module PipelineExecute(
             next_execute_is_dependent = 1'b0;
     end
 
+    // computing the output 
+    assign rm_num = instr[8:6];
+    assign rn_num = instr[5:3];
     always_ff @(posedge clk) begin 
         // there is also stalling we have to consider
         execute_done <= next_execute_done;
+        execute_is_dependent <= next_execute_is_dependent;
+        execute_result <= rd;
         execute_instr <= instr;
     end
 endmodule
