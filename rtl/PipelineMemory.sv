@@ -1,5 +1,6 @@
 module PipelineMemory(
     input clk, 
+    input reset,
     // from the pipeline stages
     input execute_done, 
     input execute_is_dependent, 
@@ -14,10 +15,10 @@ module PipelineMemory(
 );
 
     always_ff @(posedge clk) begin 
-        memory_done <= execute_done;
-        memory_is_dependent <= execute_is_dependent;
-        memory_result <= execute_result;
-        memory_instr <= execute_instr;
+        memory_done <= (reset) ? (1'b0) : execute_done;
+        memory_is_dependent <= (reset) ? (1'b0) : execute_is_dependent;
+        memory_result <= (reset) ? (16'b0) : execute_result;
+        memory_instr <= (reset) ? (16'b0) : execute_instr;
     end
 endmodule
 

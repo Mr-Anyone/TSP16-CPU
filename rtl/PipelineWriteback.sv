@@ -1,8 +1,10 @@
 `include "Constant.sv"
 
+
 module PipelineWriteback(
     // clock input
     // input clk, 
+    input reset,
 
     // from previous stage of the pipeline
     input memory_done, 
@@ -21,7 +23,7 @@ module PipelineWriteback(
     always_comb begin 
         if (memory_instr[15:14] == `A_TYPE || memory_instr[15:14] == `R_TYPE 
             || memory_instr[15:12] == 4'b1000) begin 
-            write = 1'b1;
+            write = (reset) ? 1'b0 : 1'b1;
         end else begin 
             write = 1'b0;
         end

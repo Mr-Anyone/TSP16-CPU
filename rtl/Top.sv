@@ -1,7 +1,8 @@
 /// This is basically the CPU 
 /// We will be having a few pipeline stages
 module Top(
-    input clk
+    input clk,
+    input reset
 );
     // Stalling
     wire stall_decode, stall_execute;
@@ -12,6 +13,7 @@ module Top(
     PipelineFetch fetch_pipeline(
         // input
         .clk(clk),
+        .reset(reset),
         // outputs
         .pc(fetch_pc) 
     );
@@ -24,8 +26,8 @@ module Top(
     Regfile regfile(
         // write related
         .write(writeback_write_to_regfile),
-        .write_reg_num(writeback_writenum), // FIXME: 
-        .write_data(writeback_data), // FIXME:
+        .write_reg_num(writeback_writenum),
+        .write_data(writeback_data),
         .clk(clk), 
 
         // read
@@ -41,10 +43,17 @@ module Top(
     PipelineExecute execute_pipeline(
         // clock related thingy
         .clk(clk),
+        .reset(reset),
         .instr(fetch_instr),
         // regfile input
         .rn(execute_rn),
         .rm(execute_rm),
+        // data forwarding
+        .memory_done(memory_done),
+        .memory_is_dependent(memory_is_dependent),
+        .memory_result(memory_result),
+        .memory_instr(memory_instr),
+
 
         .execute_done(execute_done),
         .execute_is_dependent(execute_is_dependent),
@@ -60,6 +69,7 @@ module Top(
     wire [15:0] memory_result, memory_instr;
     PipelineMemory memory_pipeline(
         .clk(clk),
+        .reset(reset),
 
         // from previous pipeline
         .execute_done(execute_done),
@@ -76,6 +86,7 @@ module Top(
 
     PipelineWriteback writeback_pipeline(
         // .clk(clk),
+        .reset(reset),
         // from memory pipeline
         .memory_done(memory_done),
         .memory_is_dependent(memory_is_dependent),

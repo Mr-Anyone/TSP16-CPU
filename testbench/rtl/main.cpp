@@ -18,21 +18,46 @@ VerilatedContext *init() {
   return context;
 }
 
-void init_cpu(VTop *dut) {
-  dut->rootp->Top__DOT__fetch_pc = 0;
-  // memset the entire set
+void init_cpu(VTop *dut, VerilatedContext *context, VerilatedVcdC *m_trace) {
   for (int i = 0; i < MEM_SIZE; ++i) {
     dut->rootp->Top__DOT__memory__DOT__mem[i] = 0;
   }
   dut->rootp->Top__DOT__memory__DOT__mem[0] =
       0b0000000011010001; // ADD R1, R2, R3
-  dut->rootp->Top__DOT__memory__DOT__mem[1] =
-  dut->rootp->Top__DOT__regfile__DOT__register_outputs[3] = 6;  // R3 = 6
+  dut->rootp->Top__DOT__memory__DOT__mem[1] = 0b0000000011001010;
+  dut->rootp->Top__DOT__memory__DOT__mem[2] = 0b0000000010001011;
 
-  dut->rootp->Top__DOT__regfile__DOT____Vcellout__genblk1__BRA__1__KET____DOT__register__out = 10;
-  dut->rootp->Top__DOT__regfile__DOT____Vcellout__genblk1__BRA__2__KET____DOT__register__out = 5;
-  dut->rootp->Top__DOT__regfile__DOT____Vcellout__genblk1__BRA__3__KET____DOT__register__out = 6;
+  dut->rootp
+      ->Top__DOT__regfile__DOT____Vcellout__genblk1__BRA__1__KET____DOT__register__out =
+      10;
+  dut->rootp
+      ->Top__DOT__regfile__DOT____Vcellout__genblk1__BRA__2__KET____DOT__register__out =
+      5;
+  dut->rootp
+      ->Top__DOT__regfile__DOT____Vcellout__genblk1__BRA__3__KET____DOT__register__out =
+      6;
   dut->eval();
+  m_trace->dump(context->time());
+  context->timeInc(1);
+
+  // reset
+  dut->reset = 1;
+  dut->clk = 0;
+  dut->eval();
+  m_trace->dump(context->time());
+  context->timeInc(1);
+
+  dut->reset = 1;
+  dut->clk = 1;
+  dut->eval();
+  m_trace->dump(context->time());
+  context->timeInc(1);
+
+  // pull reset down to 0
+  dut->reset = 0;
+  dut->eval();
+  m_trace->dump(context->time());
+  context->timeInc(1);
 }
 
 int main(int argc, char **argv) {
@@ -40,12 +65,13 @@ int main(int argc, char **argv) {
 
   // Creating the design under test
   VTop *dut = new VTop(context);
-  init_cpu(dut);
 
   // Create the waveform for the top level module
   VerilatedVcdC *m_trace = new VerilatedVcdC;
   dut->trace(m_trace, /*levels=*/5);
   m_trace->open("waveform.vcd");
+
+  init_cpu(dut, context, m_trace);
 
   // Setting initial data
   while (context->time() < 1000) {
