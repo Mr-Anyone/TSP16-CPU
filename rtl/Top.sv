@@ -1,6 +1,69 @@
+/// This is basically the CPU 
+/// We will be having a few pipeline stages
 module Top(
     input clk
 );
-    
+    // Stalling
+    wire stall_decode, stall_execute;
+
+    // starting the fetch pipeline
+    // We start by getting the memory
+    wire [15:0] fetch_pc, fetch_instr;
+    PipelineFetch fetch_pipeline(
+        // input
+        .clk(clk),
+        // outputs
+        .pc(fetch_pc) 
+    );
+
+    wire [2:0] execute_rm_num, execute_rn_num;
+    wire [15:0] execute_rm, execute_rn;
+    Regfile regfile(
+        // write related
+        .write(1'b0), // FIXME: this is wrong 
+        .write_reg_num(3'b0), // FIXME: 
+        .write_data(16'b0), // FIXME:
+        .clk(clk), 
+
+        // read
+        .read_reg_num(execute_rm_num),
+        .read_reg_num_two(execute_rn_num),
+        .output_one(execute_rm), 
+        .output_two(execute_rn)
+    );
+
+    // execute pipeline
+    wire execute_done, execute_is_dependent;
+    wire [15:0] execute_result, execute_instr;
+    PipelineExecute execute_pipeline(
+        // clock related thingy
+        .clk(clk),
+        .instr(fetch_instr),
+        // regfile input
+        .rn(execute_rn),
+        .rm(execute_rm),
+
+        .execute_done(execute_done),
+        .execute_is_dependent(execute_is_dependent),
+        .execute_result(execute_result),
+        .execute_instr(execute_instr),
+        // regfile number
+        .rn_num(execute_rn_num),
+        .rm_num(execute_rm_num)
+    );
+
+    wire [15:0] read_output; // FIXME: move to somewhere else
+    Memory memory(
+        .clk(clk), 
+        .write(0'b0), // FIXME: this needs to be set during memory stages
+        .write_address(16'b0), // FIXME: this to
+        .write_input(16'b0), // FIXME: this to
+
+        .read_address(16'b0), // FIXME: this to
+        .pc(fetch_pc),
+        .fetch_instr(fetch_instr),
+        .read_output(read_output)
+    );
+
 
 endmodule

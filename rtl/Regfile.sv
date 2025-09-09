@@ -1,13 +1,18 @@
-///
-///
+/// A General Regfile
+/// 
 module Regfile(
+    // input for write related things 
     input wire write, 
     input [2:0] write_reg_num, 
     input [15:0] write_data,
-    input [2:0] read_reg_num, 
     input clk,
 
-    output [15:0] output_one
+    // input for read related things
+    input [2:0] read_reg_num, 
+    input [2:0] read_reg_num_two, 
+
+    output [15:0] output_one,
+    output [15:0] output_two
 );
     wire [7:0] write_reg_onehot;
     ToOneHot onehot(
@@ -32,4 +37,5 @@ module Regfile(
     endgenerate
 
     assign output_one = register_outputs[read_reg_num];
+    assign output_two = register_outputs[read_reg_num_two];
 endmodule

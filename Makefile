@@ -5,15 +5,15 @@ top_level_testbench  := testbench/rtl/main.cpp
 all: test
 
 obj_dir/VTop: $(rtl_src) testbench/rtl/main.cpp
-	$(verilator) -cc $(rtl_src)  testbench/rtl/main.cpp  --top-module Top --trace  --exe
+	$(verilator) -cc $(rtl_src)  testbench/rtl/main.cpp  --top-module Top --trace  --exe -Irtl
 	make -C obj_dir -j -f VTop.mk
 
 obj_dir/VArithmeticLogicUnit: rtl/ArithmeticLogicUnit.sv testbench/unit/alu.cpp
-	$(verilator) -cc rtl/ArithmeticLogicUnit.sv  testbench/unit/alu.cpp  --trace  --exe
+	$(verilator) -cc rtl/ArithmeticLogicUnit.sv  testbench/unit/alu.cpp  --trace  --exe -Irtl
 	make -C obj_dir -j -f VArithmeticLogicUnit.mk
 
 obj_dir/VMemory: rtl/Memory.sv testbench/unit/memory.cpp 
-	$(verilator) -cc rtl/Memory testbench/unit/memory.cpp --trace --exe
+	$(verilator) -cc rtl/Memory testbench/unit/memory.cpp --trace --exe -Irtl
 	make -C obj_dir -j -f VMemory.mk
 
 obj_dir/VRegfile: rtl/Regfile.sv testbench/unit/regfile.cpp
@@ -33,7 +33,7 @@ debug:
 
 .PHONY: lint 
 lint: 
-	$(verilator) --lint-only -Wall $(rtl_src) --top-module Top
+	$(verilator) --lint-only -Wall $(rtl_src) --top-module Top -Irtl
 
 .PHONY: clean
 clean:
