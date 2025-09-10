@@ -5,7 +5,7 @@ module Top(
     input reset
 );
     // Stalling
-    wire stall_decode, stall_execute;
+    wire fetch_stall, execute_stall;
 
     // starting the fetch pipeline
     // We start by getting the memory
@@ -14,6 +14,7 @@ module Top(
         // input
         .clk(clk),
         .reset(reset),
+
         // outputs
         .pc(fetch_pc) 
     );
@@ -62,7 +63,9 @@ module Top(
 
         // regfile number
         .rn_num(execute_rn_num),
-        .rm_num(execute_rm_num)
+        .rm_num(execute_rm_num),
+        // stalling for data
+        .execute_stall(execute_stall)
     );
 
     wire memory_done, memory_is_dependent;

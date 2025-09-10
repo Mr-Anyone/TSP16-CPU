@@ -51,8 +51,24 @@ module PipelineExecute(
     // outputting the signals to the regfile, so that we 
     // have the register input
     output wire [2:0] rn_num,
-    output wire [2:0] rm_num
+    output wire [2:0] rm_num,
+    output reg execute_stall
 );
+    // if we have a dependency in front and it is not done, 
+    // we must stall until it is done!
+    always_comb begin
+        if((rn_num == execute_instr[2:0] || rm_num == execute_instr[2:0])
+            && execute_done == 1'b0) begin 
+            execute_stall = 1'b1;
+        end else if((rn_num == memory_instr[2:0] || rm_num == memory_instr[2:0])
+            && memory_done == 1'b0) begin 
+            execute_stall = 1'b1;
+        end else begin 
+            execute_stall = 1'b0;
+        end
+    end
+
+
     // ===================== DATA FORWARDING ====================
     // ==========================================================
     wire [15:0] actual_rm;
@@ -86,13 +102,17 @@ module PipelineExecute(
     );
 
     wire [15:0] rd;
+    wire n_status;
+    wire z_status;
     ArithmeticLogicUnit alu(
         .rn(actual_rn),
         .rm(actual_rm),
         .instr(instr), 
 
         // rd output
-        .rd(rd)
+        .rd(rd),
+        .z(z_status),
+        .n(n_status)
     );
 
 
