@@ -139,9 +139,16 @@ module PipelineExecute(
     assign rn_num = instr[5:3];
     always_ff @(posedge clk) begin 
         // there is also stalling we have to consider
-        execute_done <= (reset) ? (1'b0) : next_execute_done;
-        execute_is_dependent <= (reset)  ? (1'b0): next_execute_is_dependent;
-        execute_result <= (reset) ? (16'b0) : rd;
-        execute_instr <= (reset) ? (16'b0) : instr;
+        if(execute_stall) begin 
+            execute_done <= 1'b0;
+            execute_is_dependent <= 1'b1;
+            execute_result <= 16'b0;
+            execute_instr <= 16'b0; //noop
+        end else begin
+            execute_done <= (reset) ? (1'b0) : next_execute_done;
+            execute_is_dependent <= (reset)  ? (1'b0): next_execute_is_dependent;
+            execute_result <= (reset) ? (16'b0) : rd;
+            execute_instr <= (reset) ? (16'b0) : instr;
+        end
     end
 endmodule
