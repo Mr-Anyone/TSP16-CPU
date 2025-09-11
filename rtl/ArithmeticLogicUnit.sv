@@ -8,7 +8,8 @@ module ArithmeticLogicUnit(
 
     output reg [15:0] rd,
     output wire z, 
-    output wire n
+    output wire n,
+    output wire v
 
 );
     wire [1:0] instr_cond = instr[15:14]; 
@@ -50,4 +51,6 @@ module ArithmeticLogicUnit(
     // status register
     assign n = rd[15];
     assign z = rd == 16'b0;
+    wire [15:0] negative_rm = ~rm + 1;
+    assign v = (rn[15]^(negative_rm[15])) ? 0: (rd[15]^rn[15]);
 endmodule

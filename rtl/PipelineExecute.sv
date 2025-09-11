@@ -52,7 +52,11 @@ module PipelineExecute(
     // have the register input
     output wire [2:0] rn_num,
     output wire [2:0] rm_num,
-    output reg execute_stall
+    output reg execute_stall, 
+     // status registers
+    output wire execute_z,
+    output wire execute_v, 
+    output wire execute_n
 );
     // if we have a dependency in front and it is not done, 
     // we must stall until it is done!
@@ -102,8 +106,6 @@ module PipelineExecute(
     );
 
     wire [15:0] rd;
-    wire n_status;
-    wire z_status;
     ArithmeticLogicUnit alu(
         .rn(actual_rn),
         .rm(actual_rm),
@@ -111,8 +113,10 @@ module PipelineExecute(
 
         // rd output
         .rd(rd),
-        .z(z_status),
-        .n(n_status)
+        // status flags
+        .z(execute_z),
+        .v(execute_v),
+        .n(execute_n)
     );
 
 

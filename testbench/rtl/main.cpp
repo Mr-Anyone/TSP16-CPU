@@ -68,7 +68,7 @@ void init_cpu(VTop *dut, VerilatedContext *context, VerilatedVcdC *m_trace) {
   context->timeInc(1);
 }
 
-int main(int argc, char **argv) {
+void test_one(){
   VerilatedContext *context = init();
 
   // Creating the design under test
@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
   // Create the waveform for the top level module
   VerilatedVcdC *m_trace = new VerilatedVcdC;
   dut->trace(m_trace, /*levels=*/99);
-  m_trace->open("waveform.vcd");
+  m_trace->open("main1-waveform.vcd");
 
   init_cpu(dut, context, m_trace);
 
@@ -105,5 +105,17 @@ int main(int argc, char **argv) {
 
   delete dut;
   delete m_trace;
-  return 0;
+}
+
+// int fib(int a)
+//
+// MAIN: MOV R7, #256 // stack pointer
+//
+// 
+// FIB:
+// 
+// 
+int main(int argc, char **argv) {
+    test_one();
+    return 0;
 }

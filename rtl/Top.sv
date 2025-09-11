@@ -9,14 +9,23 @@ module Top(
 
     // starting the fetch pipeline
     // We start by getting the memory
-    wire [15:0] fetch_pc, fetch_instr;
+    wire [15:0] fetch_pc, fetch_instr, 
+        fetch_next_pc, fetch_next_instr;
     PipelineFetch fetch_pipeline(
         // input
         .clk(clk),
         .reset(reset),
+        .execute_stall(execute_stall),
+        // status flags
+        .execute_z(execute_z),
+        .execute_v(execute_v),
+        .execute_n(execute_n),
+        // input from other pipeline
+        .fetch_instr(fetch_instr),
+        .next_instr(fetch_next_instr),
 
         // outputs
-        .pc(fetch_pc) 
+        .pc(fetch_pc)
     );
 
     wire [2:0] execute_rm_num, execute_rn_num;
@@ -43,7 +52,7 @@ module Top(
     );
 
     // execute pipeline
-    wire execute_done, execute_is_dependent;
+    wire execute_done, execute_is_dependent, execute_z, execute_v, execute_n;
     wire [15:0] execute_result, execute_instr;
     PipelineExecute execute_pipeline(
         // clock related thingy
@@ -69,7 +78,11 @@ module Top(
         .rn_num(execute_rn_num),
         .rm_num(execute_rm_num),
         // stalling for data
-        .execute_stall(execute_stall)
+        .execute_stall(execute_stall),
+        // status register 
+        .execute_z(execute_z),
+        .execute_v(execute_v),
+        .execute_n(execute_n)
     );
 
     wire memory_done, memory_is_dependent, memory_write;
@@ -128,8 +141,11 @@ module Top(
         .write_input(memory_write_data),
 
         .read_address(memory_read_address),
+        .next_pc(fetch_next_pc),
         .pc(fetch_pc),
+
         .fetch_instr(fetch_instr),
+        .fetch_next_instr(fetch_next_instr),
         .read_output(memory_data_from_ram)
     );
 endmodule
