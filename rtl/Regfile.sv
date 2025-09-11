@@ -10,9 +10,13 @@ module Regfile(
     // input for read related things
     input [2:0] read_reg_num, 
     input [2:0] read_reg_num_two, 
+    input [2:0] read_reg_num_three, 
+    input [2:0] read_reg_num_four, 
 
     output [15:0] output_one,
-    output [15:0] output_two
+    output [15:0] output_two,
+    output [15:0] output_three,
+    output [15:0] output_four
 );
     wire [7:0] write_reg_onehot;
     ToOneHot onehot(
@@ -38,4 +42,6 @@ module Regfile(
 
     assign output_one = register_outputs[read_reg_num];
     assign output_two = register_outputs[read_reg_num_two];
+    assign output_three = register_outputs[read_reg_num_three];
+    assign output_four = register_outputs[read_reg_num_four];
 endmodule

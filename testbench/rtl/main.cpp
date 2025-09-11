@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 
   // Create the waveform for the top level module
   VerilatedVcdC *m_trace = new VerilatedVcdC;
-  dut->trace(m_trace, /*levels=*/5);
+  dut->trace(m_trace, /*levels=*/99);
   m_trace->open("waveform.vcd");
 
   init_cpu(dut, context, m_trace);
@@ -96,6 +96,12 @@ int main(int argc, char **argv) {
 
   m_trace->close(); // save waveform file
   std::cout << "done" << std::endl;
+
+  // checking the content of the memory
+  if(dut->rootp->Top__DOT__memory__DOT__mem[256] != 30){
+      std::cout << "failed test expected 30 but got " <<
+          dut->rootp->Top__DOT__memory__DOT__mem[256] << std::endl;
+  }
 
   delete dut;
   delete m_trace;

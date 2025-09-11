@@ -20,7 +20,7 @@ module Top(
     );
 
     wire [2:0] execute_rm_num, execute_rn_num;
-    wire [15:0] execute_rm, execute_rn;
+    wire [15:0] execute_rm, execute_rn, memory_rd, memory_rn;
     wire writeback_write_to_regfile; // be populated from Pipeline Writeback
     wire [15:0] writeback_data;
     wire [2:0] writeback_writenum;
@@ -34,8 +34,12 @@ module Top(
         // read
         .read_reg_num(execute_rm_num),
         .read_reg_num_two(execute_rn_num),
+        .read_reg_num_three(memory_rn_num),
+        .read_reg_num_four(memory_rd_num),
         .output_one(execute_rm), 
-        .output_two(execute_rn)
+        .output_two(execute_rn),
+        .output_three(memory_rn),
+        .output_four(memory_rd)
     );
 
     // execute pipeline
@@ -70,8 +74,8 @@ module Top(
 
     wire memory_done, memory_is_dependent, memory_write;
     wire [15:0] memory_result, memory_instr, 
-        memory_data_from_ram, memory_read_address, memory_write_address;
-    wire [2:0] memory_rn_num;
+        memory_data_from_ram, memory_read_address, memory_write_address, memory_write_data;
+    wire [2:0] memory_rn_num, memory_rd_num;
     PipelineMemory memory_pipeline(
         .clk(clk),
         .reset(reset),
@@ -84,18 +88,22 @@ module Top(
         // from memory module 
         .memory_data_from_ram(memory_data_from_ram),
         // from reg file
+        .memory_rn(memory_rn),
+        .memory_rd(memory_rd),
 
         // output
         .memory_done(memory_done),
         .memory_is_dependent(memory_is_dependent),
         .memory_result(memory_result),
         .memory_instr(memory_instr),
-        // from memory 
+        // to memory 
         .memory_read_address(memory_read_address), 
         .memory_write_address(memory_write_address),
         .memory_write(memory_write),
-        // from regfile 
-        .memory_rn_num(memory_rn_num)
+        .memory_write_data(memory_write_data),
+        // to regfile 
+        .memory_rn_num(memory_rn_num),
+        .memory_rd_num(memory_rd_num)
     );
 
     PipelineWriteback writeback_pipeline(
@@ -117,7 +125,7 @@ module Top(
         .clk(clk), 
         .write(memory_write),
         .write_address(memory_write_address),
-        .write_input(16'b0), // FIXME: this to
+        .write_input(memory_write_data),
 
         .read_address(memory_read_address),
         .pc(fetch_pc),
