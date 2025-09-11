@@ -68,8 +68,10 @@ module Top(
         .execute_stall(execute_stall)
     );
 
-    wire memory_done, memory_is_dependent;
-    wire [15:0] memory_result, memory_instr;
+    wire memory_done, memory_is_dependent, memory_write;
+    wire [15:0] memory_result, memory_instr, 
+        memory_data_from_ram, memory_read_address, memory_write_address;
+    wire [2:0] memory_rn_num;
     PipelineMemory memory_pipeline(
         .clk(clk),
         .reset(reset),
@@ -79,12 +81,21 @@ module Top(
         .execute_is_dependent(execute_is_dependent),
         .execute_result(execute_result),
         .execute_instr(execute_instr),
+        // from memory module 
+        .memory_data_from_ram(memory_data_from_ram),
+        // from reg file
 
         // output
         .memory_done(memory_done),
         .memory_is_dependent(memory_is_dependent),
         .memory_result(memory_result),
-        .memory_instr(memory_instr)
+        .memory_instr(memory_instr),
+        // from memory 
+        .memory_read_address(memory_read_address), 
+        .memory_write_address(memory_write_address),
+        .memory_write(memory_write),
+        // from regfile 
+        .memory_rn_num(memory_rn_num)
     );
 
     PipelineWriteback writeback_pipeline(
@@ -102,16 +113,15 @@ module Top(
         .to_regfile(writeback_data)
     );
 
-    wire [15:0] read_output; // FIXME: move to somewhere else
     Memory memory(
         .clk(clk), 
-        .write(0'b0), // FIXME: this needs to be set during memory stages
-        .write_address(16'b0), // FIXME: this to
+        .write(memory_write),
+        .write_address(memory_write_address),
         .write_input(16'b0), // FIXME: this to
 
-        .read_address(16'b0), // FIXME: this to
+        .read_address(memory_read_address),
         .pc(fetch_pc),
         .fetch_instr(fetch_instr),
-        .read_output(read_output)
+        .read_output(memory_data_from_ram)
     );
 endmodule
