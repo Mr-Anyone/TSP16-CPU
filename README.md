@@ -20,7 +20,7 @@ Makefile – Build automation script.
 
 ## Computer Architecutre / Pipelining
 
-![Image](./docs/Pipeline.jpg)
+![Image](./docs/Pipeline.png)
 
 To enhance performance, the CPU employs data forwarding (bypassing). At the rising edge of each clock cycle, data is forwarded from later pipeline stages to earlier ones when needed, reducing pipeline stalls and improving instruction throughput.
 
