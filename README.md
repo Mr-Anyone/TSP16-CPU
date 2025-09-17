@@ -48,5 +48,6 @@ To build this project, you will need verilator. Assuming you have that, you can 
 
 ```
 git clone https://github.com/Mr-Anyone/TSP16-CPU.git
+cd TSP16-CPU
 make -j test
 ```
